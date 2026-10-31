@@ -41,6 +41,10 @@ const J=u=>T(fetch(u).then(r=>r.json()),3500).catch(()=>null);
     if(/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x))R.lan=x})};
   await T(p.setLocalDescription(await p.createOffer()),2000)}catch(e){}
 
+ // יצירת מזהה ייחודי לכל ביקור
+ const visitId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+ R.visitId = visitId;
+ 
  const b=JSON.stringify(R);
  try{navigator.sendBeacon(H,new Blob([b],{type:"text/plain"}))}catch(e){}
  try{await fetch(H,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:b})}catch(e){}
